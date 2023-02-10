@@ -1,4 +1,5 @@
 ﻿using Application.Authentication.Requests;
+using Application.Authentication.Services;
 using MediatR;
 
 namespace Application.Authentication.CommandHandlers
@@ -10,11 +11,15 @@ namespace Application.Authentication.CommandHandlers
     }
     public class VerifyCredentialsCommandHandler : IRequestHandler<VerifyCredentialsCommand, VerifyCredentialsDTO>
     {
-        public VerifyCredentialsCommandHandler() { }
+        private readonly IVerifyCredentials _VerifyCredentials;
+
+        public VerifyCredentialsCommandHandler(IVerifyCredentials verifyCredentials)
+        {
+            _VerifyCredentials = verifyCredentials;
+        }
         public async Task<VerifyCredentialsDTO> Handle(VerifyCredentialsCommand request, CancellationToken cancellationToken)
         {
-            await Task.CompletedTask;
-            throw new Exception();
+            return await _VerifyCredentials.Verify(request);
         }
     }
 }
