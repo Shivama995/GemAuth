@@ -1,4 +1,7 @@
 ﻿using Application;
+using Common.Configuration;
+using Common.Configuration.Implementations;
+using Data;
 using MediatR;
 using System.Reflection;
 
@@ -21,14 +24,15 @@ namespace API
 
 
             InjectServices(services);
-            services.AddApplication();
+            services.AddApplication()
+                .AddData();
             services.AddHttpContextAccessor();
         }
-
         private void InjectServices(IServiceCollection services)
         {
             //Injecting App Settings Configuration
-            services.AddSingleton<IConfiguration>(Configuration);  
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddTransient<IConfigManager, ConfigManager>();
         }
 
         public void Configure(IApplicationBuilder app)
