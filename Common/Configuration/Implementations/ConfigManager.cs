@@ -14,5 +14,41 @@ namespace Common.Configuration.Implementations
         {
             return _Configuration;
         }
+        public string GetConnectionString(string key)
+        {
+            try
+            {
+                return _Configuration.GetConnectionString(key);
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
+        public T GetSection<T>(string key)
+        {
+            try
+            {
+                return _Configuration.GetSection(key).Get<T>();
+            }
+            catch
+            {
+            }
+
+            return default(T);
+        }
+        public string Get(string key)
+        {
+            try
+            {
+                return _Configuration[key];
+            }
+            catch
+            {
+            }
+
+            return null;
+        }
     }
 }

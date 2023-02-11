@@ -1,6 +1,9 @@
 ﻿using Application;
 using Common.Configuration;
 using Common.Configuration.Implementations;
+using Common.Cryptography;
+using Common.Cryptography.Implementations;
+using Common.Redis.Implementations;
 using Data;
 using MediatR;
 using System.Reflection;
@@ -32,6 +35,8 @@ namespace API
         {
             //Injecting App Settings Configuration
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddTransient<ICrypt, Crypt>();
+            services.AddTransient<IRedis, Redis>();
             services.AddTransient<IConfigManager, ConfigManager>();
         }
 
