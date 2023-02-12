@@ -1,8 +1,10 @@
-﻿namespace Application.Authentication.Requests
+﻿using Application.Token.DTOs;
+
+namespace Application.Authentication.Requests
 {
     public class VerifyCredentialsDTO
     {
-        public string FirstName { get; set; }
-        public string Token     { get; set; }
+        public string        FirstName { get; set; }
+        public LoginTokenDTO Token     { get; set; }
     }
 }

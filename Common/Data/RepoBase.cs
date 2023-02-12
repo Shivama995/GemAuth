@@ -14,9 +14,7 @@ namespace Common.Data
 
         public RepoBase(IConfigManager configManager)
         {
-            var Configuration = configManager.GetConfiguration();
-
-            ConnectionString = Configuration.GetConnectionString("MongoClient");
+            ConnectionString = configManager.GetConnectionString("MongoClient");
             Settings         = MongoClientSettings.FromConnectionString(ConnectionString);
             Client           = new MongoClient(Settings);
             Database         = Client.GetDatabase(AuthDataBase);
