@@ -1,11 +1,15 @@
 ﻿using Application;
+using Application.Authentication.CommandHandlers;
 using Common.Configuration;
 using Common.Configuration.Implementations;
 using Common.Cryptography;
 using Common.Cryptography.Implementations;
+using Common.Logger;
+using Common.Logger.Implementations;
 using Common.Redis.Implementations;
 using Data;
 using MediatR;
+using Serilog;
 using System.Reflection;
 
 namespace API
@@ -33,10 +37,18 @@ namespace API
         }
         private void InjectServices(IServiceCollection services)
         {
-            //Injecting App Settings Configuration
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddTransient<ICrypt, Crypt>();
             services.AddTransient<IRedis, Redis>();
+            //services.AddLogging();
+            Log.Logger = new LoggerConfiguration().CreateLogger();
+            services.AddLogging(delegate (ILoggingBuilder loggingBuilder)
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddSerilog(Log.Logger, true);
+            });
+            services.AddSingleton(Log.Logger);
+            services.AddTransient<IGemLogger, GemLogger>();
             services.AddTransient<IConfigManager, ConfigManager>();
         }
 

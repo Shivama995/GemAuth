@@ -3,6 +3,7 @@ using Common.Application.Token;
 using Common.Configuration;
 using Common.Constants;
 using Common.Cryptography;
+using Common.Exceptions;
 using Common.Extensions;
 using Common.Redis.Implementations;
 using Data.Authentication.Models;
@@ -22,7 +23,7 @@ namespace Application.Token.Services.Implementations
             ICrypt crypt,
             IRedis redisStore) : base(configManager)
         {
-            _Crypt      = crypt;
+            _Crypt = crypt;
             _RedisStore = redisStore;
         }
 
@@ -34,23 +35,43 @@ namespace Application.Token.Services.Implementations
             await UpdateTokenInCache(userDetails.Id, LoginTokenDTO, TokenExpiresIn);
             return LoginTokenDTO;
         }
+        public async Task VerifyJwtToken(string token)
+        {
+            var JwtToken = await ValidateToken(token);
+            if (JwtToken.IsNull())
+                throw new InvalidAuthorizationTokenException();
+            var LoginTokenDTO = await GetModelFromClaims(JwtToken);
 
+            var TokenDTO = await GetTokenFromCache(LoginTokenDTO.Id);
+
+            if (TokenDTO.IsNull() || TokenDTO.Authorization.IsEmpty() || !TokenDTO.Authorization.Equals(token))
+                throw new AuthorizationTokenExpiredException();
+        }
         #region Private Methods
+        private async Task<UserDetailsModel> GetModelFromClaims(JwtSecurityToken token)
+        {
+            var ClaimsData = token.Claims.FirstOrDefault(x => x.Type == CustomClaimTypes.AuthorizationClaimsData)?.Value;
+            return await _Crypt.Decrypt<UserDetailsModel>(ClaimsData);
+        }
+        private async Task<LoginTokenDTO> GetTokenFromCache(string userId)
+        {
+            return await _RedisStore.GetValueFromCache<LoginTokenDTO>(string.Format(_AuthTokenCacheKey, userId));
+        }
         private async Task UpdateTokenInCache(string userId, LoginTokenDTO loginTokenDTO, TimeSpan tokenExpiresIn)
         {
             await _RedisStore.PutValueInCache(string.Format(_AuthTokenCacheKey, userId), loginTokenDTO, tokenExpiresIn);
         }
         private async Task<LoginTokenDTO> CreateLoginTokenDTO(UserDetailsModel userDetails)
         {
-            var           JwtTokenSettings        = GetJwtTokenSettings();
-            var           JwtSecurityTokenHandler = new JwtSecurityTokenHandler();
-            var           TokenDescriptor         = await GetSecurityTokenDescriptor(userDetails, JwtTokenSettings);
-            SecurityToken AuthorizationToken      = JwtSecurityTokenHandler.CreateToken(TokenDescriptor);
+            var JwtTokenSettings = GetJwtTokenSettings();
+            var JwtSecurityTokenHandler = new JwtSecurityTokenHandler();
+            var TokenDescriptor = await GetSecurityTokenDescriptor(userDetails, JwtTokenSettings);
+            SecurityToken AuthorizationToken = JwtSecurityTokenHandler.CreateToken(TokenDescriptor);
 
             return new LoginTokenDTO
             {
                 Authorization = JwtSecurityTokenHandler.WriteToken(AuthorizationToken),
-                ExpiresAt     = Convert.ToDateTime(TokenDescriptor.Expires).ToLocalTime()
+                ExpiresAt = Convert.ToDateTime(TokenDescriptor.Expires).ToLocalTime()
             };
         }
         private async Task<SecurityTokenDescriptor> GetSecurityTokenDescriptor(UserDetailsModel userDetails, JwtTokenSettings jwtTokenSettings)
@@ -101,11 +122,11 @@ namespace Application.Token.Services.Implementations
 
             JwtSecurityTokenHandler.ValidateToken(token, TokenValidationParameters, out SecurityToken ValidatedToken);
             if (ValidatedToken.IsNull())
-                //throw proper exception
-                throw new Exception();
+                throw new InvalidAuthorizationTokenException();
 
             return ValidatedToken as JwtSecurityToken;
         }
         #endregion
+    }
     }
 }
