@@ -9,6 +9,7 @@ namespace API.Controllers
         public AuthenticationController(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor) { }
 
         [HttpPost]
+        [Route("Credentials/Verify")]
         public async Task<VerifyCredentialsDTO> VerifyCredentials(VerifyCredentialsCommand request) =>
             await CommandAsync(request);
             

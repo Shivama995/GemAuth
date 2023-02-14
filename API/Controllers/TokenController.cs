@@ -1,4 +1,6 @@
-﻿using Application.Token.Services;
+﻿using Application.Token.DTOs;
+using Application.Token.QueryHandler;
+using Application.Token.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -6,13 +8,10 @@ namespace API.Controllers
     public class TokenController : BaseController
     {
         ILoginTokenService _LoginTokenService;
-        public TokenController(IHttpContextAccessor httpContextAccessor,
-            ILoginTokenService loginTokenService) : base(httpContextAccessor) 
-        {
-            _LoginTokenService = loginTokenService;
-        }
+        public TokenController(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor) { }
         [HttpGet]
-        public async Task Verify(string token) =>
-            await _LoginTokenService.VerifyJwtToken(token);
+        [Route("Verify")]
+        public async Task<VerifyLoginTokenDTO> Verify(string token) =>
+            await QueryAsync(new VerifyLoginTokenQuery { Token = token });
     }
 }
