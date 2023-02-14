@@ -27,25 +27,28 @@ namespace Application.Token.Services.Implementations
             _RedisStore = redisStore;
         }
 
-        public async Task<LoginTokenDTO> CreateLoginToken(UserDetailsModel userDetails)
+        public async Task<LoginTokenModel> CreateLoginToken(UserDetailsModel userDetails)
         {
-            var LoginTokenDTO = await CreateLoginTokenDTO(userDetails);
-            var TokenExpiresIn = LoginTokenDTO.ExpiresAt.ToUniversalTime() - DateTime.UtcNow;
+            var LoginTokenModel = await CreateLoginTokenModel(userDetails);
+            var TokenExpiresIn = LoginTokenModel.ExpiresAt.ToUniversalTime() - DateTime.UtcNow;
 
-            await UpdateTokenInCache(userDetails.Id, LoginTokenDTO, TokenExpiresIn);
-            return LoginTokenDTO;
+            await UpdateTokenInCache(userDetails.Id, LoginTokenModel, TokenExpiresIn);
+            return LoginTokenModel;
         }
-        public async Task VerifyJwtToken(string token)
+        public async Task<VerifyLoginTokenDTO> VerifyJwtToken(string token)
         {
             var JwtToken = await ValidateToken(token);
             if (JwtToken.IsNull())
                 throw new InvalidAuthorizationTokenException();
-            var LoginTokenDTO = await GetModelFromClaims(JwtToken);
+            var LoginTokenModel = await GetModelFromClaims(JwtToken);
 
-            var TokenDTO = await GetTokenFromCache(LoginTokenDTO.Id);
+            var TokenModel = await GetTokenFromCache(LoginTokenModel.Id);
 
-            if (TokenDTO.IsNull() || TokenDTO.Authorization.IsEmpty() || !TokenDTO.Authorization.Equals(token))
+            if (TokenModel.IsNull() || TokenModel.Authorization.IsEmpty() || !TokenModel.Authorization.Equals(token))
                 throw new AuthorizationTokenExpiredException();
+
+            //Populate when user details are set
+            return new VerifyLoginTokenDTO { };
         }
         #region Private Methods
         private async Task<UserDetailsModel> GetModelFromClaims(JwtSecurityToken token)
@@ -53,22 +56,22 @@ namespace Application.Token.Services.Implementations
             var ClaimsData = token.Claims.FirstOrDefault(x => x.Type == CustomClaimTypes.AuthorizationClaimsData)?.Value;
             return await _Crypt.Decrypt<UserDetailsModel>(ClaimsData);
         }
-        private async Task<LoginTokenDTO> GetTokenFromCache(string userId)
+        private async Task<LoginTokenModel> GetTokenFromCache(string userId)
         {
-            return await _RedisStore.GetValueFromCache<LoginTokenDTO>(string.Format(_AuthTokenCacheKey, userId));
+            return await _RedisStore.GetValueFromCache<LoginTokenModel>(string.Format(_AuthTokenCacheKey, userId));
         }
-        private async Task UpdateTokenInCache(string userId, LoginTokenDTO loginTokenDTO, TimeSpan tokenExpiresIn)
+        private async Task UpdateTokenInCache(string userId, LoginTokenModel loginTokenModel, TimeSpan tokenExpiresIn)
         {
-            await _RedisStore.PutValueInCache(string.Format(_AuthTokenCacheKey, userId), loginTokenDTO, tokenExpiresIn);
+            await _RedisStore.PutValueInCache(string.Format(_AuthTokenCacheKey, userId), loginTokenModel, tokenExpiresIn);
         }
-        private async Task<LoginTokenDTO> CreateLoginTokenDTO(UserDetailsModel userDetails)
+        private async Task<LoginTokenModel> CreateLoginTokenModel(UserDetailsModel userDetails)
         {
             var JwtTokenSettings = GetJwtTokenSettings();
             var JwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var TokenDescriptor = await GetSecurityTokenDescriptor(userDetails, JwtTokenSettings);
             SecurityToken AuthorizationToken = JwtSecurityTokenHandler.CreateToken(TokenDescriptor);
 
-            return new LoginTokenDTO
+            return new LoginTokenModel
             {
                 Authorization = JwtSecurityTokenHandler.WriteToken(AuthorizationToken),
                 ExpiresAt = Convert.ToDateTime(TokenDescriptor.Expires).ToLocalTime()
@@ -127,6 +130,5 @@ namespace Application.Token.Services.Implementations
             return ValidatedToken as JwtSecurityToken;
         }
         #endregion
-    }
     }
 }

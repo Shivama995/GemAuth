@@ -1,4 +1,5 @@
 ﻿using Common.Configuration;
+using Common.Constants;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -6,21 +7,25 @@ namespace Common.Data
 {
     public class RepoBase
     {
+        public IMongoDatabase               Database { get; private set; }
         public readonly string              ConnectionString;
-        public readonly IMongoDatabase      Database;
         public readonly MongoClient         Client;
         public readonly MongoClientSettings Settings;
-        public readonly string              AuthDataBase = "gemini_auth";
 
         public RepoBase(IConfigManager configManager)
         {
             ConnectionString = configManager.GetConnectionString("MongoClient");
             Settings         = MongoClientSettings.FromConnectionString(ConnectionString);
             Client           = new MongoClient(Settings);
-            Database         = Client.GetDatabase(AuthDataBase);
+            Database         = Client.GetDatabase(DatabaseName.Config);
         }
 
         public IMongoCollection<T> GetDBCollection<T>(string collectionName) =>
-        Database.GetCollection<T>(collectionName);
+            Database.GetCollection<T>(collectionName);
+
+        public void LoadDatabase(string databaseName)
+        {
+            Database = Client.GetDatabase(databaseName);
+        }
     }
 }

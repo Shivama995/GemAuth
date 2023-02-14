@@ -1,8 +1,6 @@
 ﻿using Application.Authentication.Requests;
 using Application.Authentication.Services;
-using Common.Configuration;
 using MediatR;
-using Microsoft.Extensions.Configuration;
 
 namespace Application.Authentication.CommandHandlers
 {
@@ -21,9 +19,7 @@ namespace Application.Authentication.CommandHandlers
         }
 
 
-        public async Task<VerifyCredentialsDTO> Handle(VerifyCredentialsCommand request, CancellationToken cancellationToken)
-        {
-            return await _VerifyCredentialsService.Verify(request);
-        }
+        public async Task<VerifyCredentialsDTO> Handle(VerifyCredentialsCommand request, CancellationToken cancellationToken) =>
+            await _VerifyCredentialsService.Verify(request);
     }
 }

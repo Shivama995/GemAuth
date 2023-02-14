@@ -1,12 +1,12 @@
 ﻿using Application.Token.DTOs;
+using Common.Application.Token;
 using Data.Authentication.Models;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Application.Token.Services
 {
     public interface ILoginTokenService
     {
-        Task<LoginTokenDTO> CreateLoginToken(UserDetailsModel userDetails);
-        Task VerifyJwtToken(string token);
+        Task<LoginTokenModel> CreateLoginToken(UserDetailsModel userDetails);
+        Task<VerifyLoginTokenDTO> VerifyJwtToken(string token);
     }
 }
