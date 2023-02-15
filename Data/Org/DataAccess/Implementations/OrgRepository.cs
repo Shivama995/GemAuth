@@ -9,29 +9,45 @@ namespace Data.Org.DataAccess.Implementations
     {
         public OrgRepository(IConfigManager configManager) : base(configManager) { }
 
-        public async Task<OrgModel> Register(OrgModel orgData)
+        public async Task<OrgDetails> Register(OrgDetails orgDetails)
         {
-            var Collection = Database.GetCollection<OrgModel>("org_base");
-            SetModificationDetails(orgData);
+            SetModificationDetails(orgDetails);
+            LoadDatabase(orgDetails.DBName);
 
-            await Collection.InsertOneAsync(orgData);
-            return orgData;
+            var Collection = Database.GetCollection<OrgDetails>("org_base");
+            await Collection.InsertOneAsync(orgDetails);
+            return orgDetails;
         }
 
         public async Task<List<string>> GetOrgNames()
         {
-            var Collection = Database.GetCollection<OrgModel>("org_base");
+            var Collection = Database.GetCollection<OrgDetails>("org_base");
 
             return await Collection
                 .Find(x => true)
                 .Project(row => row.OrgName)
                 .ToListAsync();
         }
-
-        private void SetModificationDetails(OrgModel orgData)
+        private async Task SetUpOrgDetails(OrgDetails orgData)
         {
-            orgData.CreatedOn  = DateTime.Now;
-            orgData.ModifiedOn = DateTime.Now;
+            LoadDatabase(orgData.DBName);
+
+            var Collection = Database.GetCollection<OrgDetails>("org_base");
+
+            await Collection.InsertOneAsync(
+                new OrgDetails
+                {
+                    OrgName    = orgData.OrgName,
+                    OrgCode    = orgData.OrgCode,
+                    DBName     = orgData.DBName,
+                    ModifiedOn = DateTime.Now,
+                    CreatedOn  = DateTime.Now,
+                });
+        }
+        private void SetModificationDetails(OrgDetails orgDetails)
+        {
+            orgDetails.CreatedOn  = DateTime.Now;
+            orgDetails.ModifiedOn = DateTime.Now;
         }
     }
 }

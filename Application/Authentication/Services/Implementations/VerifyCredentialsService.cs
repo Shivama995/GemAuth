@@ -4,9 +4,7 @@ using Application.Token.Services;
 using Common.Application;
 using Common.Exceptions;
 using Common.Extensions;
-using Common.Logger;
-using Data.Authentication.DataAccess;
-using Microsoft.Extensions.Logging;
+using Data.User.DataAccess;
 
 namespace Application.Authentication.Services.Implementations
 {

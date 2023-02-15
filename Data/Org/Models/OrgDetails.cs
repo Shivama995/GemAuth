@@ -1,6 +1,6 @@
 ﻿namespace Data.Org.Models
 {
-    public class OrgModel
+    public class OrgDetails
     {
         public string OrgName      { get; set; }
         public string OrgCode      { get; set; }
