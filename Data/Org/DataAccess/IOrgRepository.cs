@@ -4,7 +4,7 @@ namespace Data.Org.DataAccess
 {
     public interface IOrgRepository
     {
-        Task<OrgModel> Register(OrgModel orgData);
+        Task<OrgDetails> Register(OrgDetails orgDetails);
         Task<List<string>> GetOrgNames();
     }
 }

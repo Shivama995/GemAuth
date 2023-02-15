@@ -18,49 +18,12 @@ namespace Data.User.DataAccess.Implementations
                 .FirstOrDefault();
 
         }
-        public async Task<UserDetailsModel> AddUser(UserAggregateModel user)
+        public async Task<UserDetailsModel> AddAdmin(UserDetailsModel user, string DBName)
         {
-
-            var UserAuthModelTask    = AddNewUserAuthModel(user);
-            var UserDetailsModelTask = AddNewUserDetailsModel(user);
-
-            Task.WaitAll(UserAuthModelTask, UserDetailsModelTask);
-            return UserDetailsModelTask.Result;
-        }
-
-        private async Task<UserAuthModel> AddNewUserAuthModel(UserAggregateModel user)
-        {
-            UserAuthModel User = new UserAuthModel
-            {
-                FirstName    = user.FirstName,
-                LastName     = user.LastName,
-                EmailAddress = user.EmailAddress,
-                DBName       = user.DBName,
-                Id           = user.Id,
-                OrgCode      = user.OrgCode,
-                Role         = user.Role
-            };
-            var Collection = Database.GetCollection<UserAuthModel>("user_base");
-            await Collection.InsertOneAsync(User);
-            return User;
-        }
-
-        private async Task<UserDetailsModel> AddNewUserDetailsModel(UserAggregateModel user)
-        {
-            UserDetailsModel User = new UserDetailsModel
-            {
-                FirstName    = user.FirstName,
-                LastName     = user.LastName,
-                EmailAddress = user.EmailAddress,
-                Password     = user.Password,
-                Id           = user.Id,
-                OrgCode      = user.OrgCode,
-                Role         = user.Role
-            };
-            LoadDatabase(user.DBName);
+            LoadDatabase(DBName);
             var Collection = Database.GetCollection<UserDetailsModel>("user_base");
-            await Collection.InsertOneAsync(User);
-            return User;
+            await Collection.InsertOneAsync(user);
+            return user;
         }
     }
 }

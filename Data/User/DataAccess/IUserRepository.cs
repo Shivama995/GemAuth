@@ -5,6 +5,6 @@ namespace Data.User.DataAccess
     public interface IUserRepository
     {
         Task<UserDetailsModel> GetUserDetails(string emailAddress);
-        Task<UserDetailsModel> AddUser(UserAggregateModel user);
+        Task<UserDetailsModel> AddAdmin(UserDetailsModel user, string DBName);
     }
 }

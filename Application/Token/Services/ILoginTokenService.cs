@@ -1,6 +1,6 @@
 ﻿using Application.Token.DTOs;
 using Common.Application.Token;
-using Data.Authentication.Models;
+using Data.User.Models;
 
 namespace Application.Token.Services
 {

@@ -6,7 +6,7 @@ using Common.Cryptography;
 using Common.Exceptions;
 using Common.Extensions;
 using Common.Redis.Implementations;
-using Data.Authentication.Models;
+using Data.User.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,7 +23,7 @@ namespace Application.Token.Services.Implementations
             ICrypt crypt,
             IRedis redisStore) : base(configManager)
         {
-            _Crypt = crypt;
+            _Crypt      = crypt;
             _RedisStore = redisStore;
         }
 
