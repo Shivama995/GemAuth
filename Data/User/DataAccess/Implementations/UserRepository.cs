@@ -18,6 +18,7 @@ namespace Data.User.DataAccess.Implementations
                 .FirstOrDefault();
 
         }
+
         public async Task<UserDetailsModel> AddAdmin(UserDetailsModel user, string DBName)
         {
             LoadDatabase(DBName);

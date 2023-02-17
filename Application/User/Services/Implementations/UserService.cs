@@ -1,20 +1,21 @@
-﻿using Common.Configuration;
-using Common.Data;
+﻿using AutoMapper;
+using Common.Application;
 using Common.Enums;
 using Data.Config.DataAccess;
+using Data.Config.Models;
 using Data.User.DataAccess;
 using Data.User.Models;
 
 namespace Application.User.Services.Implementations
 {
-    public class UserService : RepoBase, IUserService
+    public class UserService : ServiceBase, IUserService
     {
         private readonly IUserRepository       _UserRepository;
         private readonly IConfigUserRepository _ConfigUserRepository;
 
         public UserService(IUserRepository userRepository,
-            IConfigManager configManager,
-            IConfigUserRepository configUserRepository) : base(configManager)
+            IConfigUserRepository configUserRepository,
+            IMapper mapper) : base(mapper)
         {
             _UserRepository       = userRepository;
             _ConfigUserRepository = configUserRepository;
@@ -31,16 +32,11 @@ namespace Application.User.Services.Implementations
 
         private async Task AddAdminForConfig(UserAggregateModel user)
         {
-            await _ConfigUserRepository.AddUser(new Data.Config.Models.ConfigUserDetails
-            {
-                Id           = user.UserDetails.Id,
-                FirstName    = user.UserDetails.FirstName,
-                LastName     = user.UserDetails.LastName,
-                EmailAddress = user.UserDetails.EmailAddress,
-                Role         = user.UserDetails.Role,
-                DBName       = user.OrgDetails.DBName,
-                OrgCode      = user.OrgDetails.OrgCode,
-            });
+            ConfigUserDetails ConfigUserDetails = _Mapper.Map<ConfigUserDetails>(user.UserDetails);
+            ConfigUserDetails.DBName  = user.OrgDetails.DBName;
+            ConfigUserDetails.OrgCode = user.OrgDetails.OrgCode;
+
+            await _ConfigUserRepository.AddUser(ConfigUserDetails);
         }
     }
 }

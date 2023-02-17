@@ -1,6 +1,7 @@
 ﻿using Application.Authentication.CommandHandlers;
 using Application.Authentication.Requests;
 using Application.Token.Services;
+using AutoMapper;
 using Common.Application;
 using Common.Exceptions;
 using Common.Extensions;
@@ -13,7 +14,8 @@ namespace Application.Authentication.Services.Implementations
         private readonly IUserRepository    _UserRepository;
         private readonly ILoginTokenService _LoginTokenService;
         public VerifyCredentialsService(IUserRepository userRepository,
-            ILoginTokenService loginTokenService)
+            ILoginTokenService loginTokenService,
+            IMapper mapper) : base(mapper)
         {
             _UserRepository    = userRepository;
             _LoginTokenService = loginTokenService;

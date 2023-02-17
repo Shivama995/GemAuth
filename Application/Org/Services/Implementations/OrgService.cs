@@ -1,9 +1,11 @@
 ﻿using Application.Org.CommandHandlers;
 using Application.Org.DTOs;
 using Application.User.Services;
+using AutoMapper;
 using Common.Application;
 using Common.Exceptions;
 using Data.Config.DataAccess.Implementations;
+using Data.Config.Models;
 using Data.Org.DataAccess;
 using Data.Org.Models;
 using Data.User.Models;
@@ -13,15 +15,16 @@ namespace Application.Org.Services.Implementations
     public class OrgService : ServiceBase, IOrgService
     {
         #region Private Members
-        private readonly IOrgRepository _OrgRepository;
+        private readonly IOrgRepository       _OrgRepository;
         private readonly IConfigOrgRepository _ConfigOrgRepository;
-        private readonly IUserService   _UserService;
+        private readonly IUserService         _UserService;
         #endregion
 
         #region Constructor
         public OrgService(IOrgRepository orgRepository,
             IConfigOrgRepository configOrgRepository,
-            IUserService userService)
+            IUserService userService,
+            IMapper mapper) : base(mapper)
         {
             _OrgRepository       = orgRepository;
             _ConfigOrgRepository = configOrgRepository;
@@ -37,13 +40,7 @@ namespace Application.Org.Services.Implementations
             //Filling OrgData with all details
             await RegisterNewOrg(OrgData);
             await CreateAdminForOrg(request, OrgData);
-            return new RegisterAppDTO
-            {
-                OrgCode    = OrgData.OrgCode,
-                OrgName    = OrgData.OrgName,
-                CreatedOn  = OrgData.CreatedOn,
-                ModifiedOn = OrgData.ModifiedOn
-            };
+            return _Mapper.Map<RegisterAppDTO>(OrgData);
         }
 
         #endregion
@@ -60,14 +57,9 @@ namespace Application.Org.Services.Implementations
                    EmailAddress = request.EmailAddress,
                    Password     = request.Password
                },
-               OrgDetails  = new OrgDetails
-               {
-                   OrgCode = orgDetails.OrgCode,
-                   OrgName = orgDetails.OrgName,
-                   DBName  = orgDetails.DBName
-               }
+               OrgDetails       = orgDetails
             });
-        }
+         }
         private async Task ValidateOrgData(RegisterAppCommand request)
         {
            var OrgNames = await _OrgRepository.GetOrgNames();
@@ -86,20 +78,11 @@ namespace Application.Org.Services.Implementations
         private async Task RegisterNewOrg(OrgDetails orgData)
         {
             //Setup Org in Config DB
-            await _ConfigOrgRepository.SetUpConfigOrg(new Data.Config.Models.ConfigOrgDetails
-            {
-                OrgName = orgData.OrgName,
-                OrgCode = orgData.OrgCode,
-                DBName  = orgData.DBName
-            });
+            await _ConfigOrgRepository.SetUpConfigOrg(
+                _Mapper.Map<ConfigOrgDetails>(orgData));
 
             //Setup Org
-            await _OrgRepository.Register(new OrgDetails
-            {
-                OrgCode = orgData.OrgCode,
-                OrgName = orgData.OrgName,
-                DBName  = orgData.DBName
-            });
+            await _OrgRepository.Register(orgData);
         }
         #endregion
     }
