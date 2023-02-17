@@ -33,16 +33,9 @@ namespace Data.Org.DataAccess.Implementations
             LoadDatabase(orgData.DBName);
 
             var Collection = Database.GetCollection<OrgDetails>("org_base");
+            SetModificationDetails(orgData);
 
-            await Collection.InsertOneAsync(
-                new OrgDetails
-                {
-                    OrgName    = orgData.OrgName,
-                    OrgCode    = orgData.OrgCode,
-                    DBName     = orgData.DBName,
-                    ModifiedOn = DateTime.Now,
-                    CreatedOn  = DateTime.Now,
-                });
+            await Collection.InsertOneAsync(orgData);
         }
         private void SetModificationDetails(OrgDetails orgDetails)
         {

@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Authentication.CommandHandlers;
+using AutoMapper;
 using Common.Configuration;
 using Common.Configuration.Implementations;
 using Common.Cryptography;
