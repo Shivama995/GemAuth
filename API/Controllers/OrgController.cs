@@ -1,10 +1,11 @@
-﻿using Application.Org.CommandHandlers;
+﻿using Application.Authentication.Attributes;
+using Application.Org.CommandHandlers;
 using Application.Org.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class OrgController : BaseController
+    public class OrgController : PrivateController
     {
         public OrgController(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor) { }
 
