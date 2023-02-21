@@ -1,4 +1,5 @@
 ﻿using Application.Token.DTOs;
+using Application.User.Services;
 using Common.Application.Token;
 using Common.Configuration;
 using Common.Constants;
@@ -15,16 +16,19 @@ namespace Application.Token.Services.Implementations
 {
     public class LoginTokenService : JwtTokenService, ILoginTokenService
     {
-        private readonly ICrypt _Crypt;
-        private readonly IRedis _RedisStore;
+        private readonly ICrypt       _Crypt;
+        private readonly IRedis       _RedisStore;
+        private readonly IUserService _UserService;
         private readonly string _AuthTokenCacheKey = "AuthorizationToken:{0}";
 
         public LoginTokenService(IConfigManager configManager,
             ICrypt crypt,
-            IRedis redisStore) : base(configManager)
+            IRedis redisStore,
+            IUserService userService) : base(configManager)
         {
-            _Crypt      = crypt;
-            _RedisStore = redisStore;
+            _Crypt       = crypt;
+            _RedisStore  = redisStore;
+            _UserService = userService;
         }
 
         public async Task<LoginTokenModel> CreateLoginToken(UserDetailsModel userDetails)
@@ -47,8 +51,8 @@ namespace Application.Token.Services.Implementations
             if (TokenModel.IsNull() || TokenModel.Authorization.IsEmpty() || !TokenModel.Authorization.Equals(token))
                 throw new AuthorizationTokenExpiredException();
 
-            //Populate when user details are set
-            return new VerifyLoginTokenDTO { };
+            var UserAggregateDetails = await _UserService.GetUserAggregateData(LoginTokenModel.EmailAddress);
+            return new VerifyLoginTokenDTO { UserData = UserAggregateDetails };
         }
         #region Private Methods
         private async Task<UserDetailsModel> GetModelFromClaims(JwtSecurityToken token)

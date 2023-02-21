@@ -1,5 +1,6 @@
 ﻿using Common.Configuration;
 using Common.Data;
+using Data.Config.Models;
 using Data.Org.Models;
 using MongoDB.Driver;
 
@@ -9,6 +10,16 @@ namespace Data.Org.DataAccess.Implementations
     {
         public OrgRepository(IConfigManager configManager) : base(configManager) { }
 
+        public async Task<OrgDetails> GetOrgDetails(string DBName)
+        {
+            LoadDatabase(DBName);
+            var Collection = Database.GetCollection<OrgDetails>("org_base");
+            return (await Collection.FindAsync(Builders<OrgDetails>
+                .Filter
+                .Eq("DBName", DBName)))
+                .FirstOrDefault();
+
+        }
         public async Task<OrgDetails> Register(OrgDetails orgDetails)
         {
             SetModificationDetails(orgDetails);

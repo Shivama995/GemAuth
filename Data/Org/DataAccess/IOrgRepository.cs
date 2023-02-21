@@ -6,5 +6,6 @@ namespace Data.Org.DataAccess
     {
         Task<OrgDetails> Register(OrgDetails orgDetails);
         Task<List<string>> GetOrgNames();
+        Task<OrgDetails> GetOrgDetails(string DBName);
     }
 }

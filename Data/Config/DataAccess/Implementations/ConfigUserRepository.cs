@@ -1,6 +1,7 @@
 ﻿using Common.Configuration;
 using Common.Data;
 using Data.Config.Models;
+using MongoDB.Driver;
 
 namespace Data.Config.DataAccess.Implementations
 {
@@ -13,6 +14,15 @@ namespace Data.Config.DataAccess.Implementations
             var Collection = Database.GetCollection<ConfigUserDetails>("user_base");
 
             await Collection.InsertOneAsync(configUserDetails);
+        }
+        public async Task<ConfigUserDetails> GetConfigUserDetails(string emailAddress)
+        {
+            var Collection = Database.GetCollection<ConfigUserDetails>("user_base");
+
+            return (await Collection.FindAsync(Builders<ConfigUserDetails>
+                .Filter
+                .Eq("EmailAddress", emailAddress)))
+                .FirstOrDefault();
         }
     }
 }
