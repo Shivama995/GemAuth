@@ -1,6 +1,4 @@
-﻿using Common.Enums;
-using Data.Org.Models;
-using MongoDB.Bson;
+﻿using Data.Org.Models;
 
 namespace Data.User.Models
 {

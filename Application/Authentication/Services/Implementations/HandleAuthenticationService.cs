@@ -1,6 +1,7 @@
 ﻿using Application.Token.Services;
 using Common.Exceptions;
 using Common.Extensions;
+using Data.User.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Primitives;
 
@@ -28,6 +29,9 @@ namespace Application.Authentication.Services.Implementations
             {
                 var LoginTokenData = await _LoginTokenService.VerifyJwtToken(token);
                 if (LoginTokenData.IsNull()) { throw new InvalidAuthorizationTokenException(); }
+
+                UserAggregateAuthModel.OrgDetails = LoginTokenData.UserData.OrgDetails;
+                UserAggregateAuthModel.UserDetails = LoginTokenData.UserData.UserDetails;
             }
             catch (Exception ex) { throw new InvalidAuthorizationTokenException(); }
         }

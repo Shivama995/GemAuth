@@ -4,6 +4,7 @@ using Application.Token.Services;
 using Application.User.Services;
 using AutoMapper;
 using Common.Application;
+using Common.Constants;
 using Common.Exceptions;
 using Common.Extensions;
 using Data.User.DataAccess;
@@ -23,7 +24,7 @@ namespace Application.Authentication.Services.Implementations
         }
         public async Task<VerifyCredentialsDTO> Verify(VerifyCredentialsCommand request)
         {
-            var UserAggregateData = await _UserService.GetUserAggregateData(request.EmailAddress);
+            var UserAggregateData = await _UserService.GetUserAggregateData(UserIdentifiers.EmailAddress, request.EmailAddress);
             if (UserAggregateData.IsNull())
                 throw new UserNotFoundException("Email Address not found!");
 
