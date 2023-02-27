@@ -4,8 +4,8 @@ namespace Data.Org.DataAccess
 {
     public interface IOrgRepository
     {
-        Task<OrgDetails> Register(OrgDetails orgDetails);
-        Task<List<string>> GetOrgNames();
-        Task<OrgDetails> GetOrgDetails(string DBName);
+        Task<OrgDetails> Register(OrgDetails orgDetails, string DBName = null);
+        Task<List<string>> GetOrgNames(string DBName = null);
+        Task<OrgDetails> GetOrgDetails(string DBName = null);
     }
 }

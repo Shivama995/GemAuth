@@ -5,6 +5,6 @@ namespace Data.Config.DataAccess
     public interface IConfigUserRepository
     {
         Task AddUser(ConfigUserDetails configUserDetails);
-        Task<ConfigUserDetails> GetConfigUserDetails(string emailAddress);
+        Task<ConfigUserDetails> GetConfigUserDetails(string identifier, string id);
     }
 }

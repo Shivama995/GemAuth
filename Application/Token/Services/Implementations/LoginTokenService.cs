@@ -51,7 +51,7 @@ namespace Application.Token.Services.Implementations
             if (TokenModel.IsNull() || TokenModel.Authorization.IsEmpty() || !TokenModel.Authorization.Equals(token))
                 throw new AuthorizationTokenExpiredException();
 
-            var UserAggregateDetails = await _UserService.GetUserAggregateData(LoginTokenModel.EmailAddress);
+            var UserAggregateDetails = await _UserService.GetUserAggregateData(UserIdentifiers.EmailAddress, LoginTokenModel.EmailAddress);
             return new VerifyLoginTokenDTO { UserData = UserAggregateDetails };
         }
         #region Private Methods

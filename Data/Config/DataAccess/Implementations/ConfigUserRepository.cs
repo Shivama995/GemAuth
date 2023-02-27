@@ -15,13 +15,13 @@ namespace Data.Config.DataAccess.Implementations
 
             await Collection.InsertOneAsync(configUserDetails);
         }
-        public async Task<ConfigUserDetails> GetConfigUserDetails(string emailAddress)
+        public async Task<ConfigUserDetails> GetConfigUserDetails(string identifier, string id)
         {
             var Collection = Database.GetCollection<ConfigUserDetails>("user_base");
 
             return (await Collection.FindAsync(Builders<ConfigUserDetails>
                 .Filter
-                .Eq("EmailAddress", emailAddress)))
+                .Eq(identifier, id)))
                 .FirstOrDefault();
         }
     }

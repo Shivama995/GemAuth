@@ -13,7 +13,7 @@ namespace Application.Authentication.Attributes
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-                _HandleAuthenticationService.HandleAuthentication(context).Wait();
+            _HandleAuthenticationService.HandleAuthentication(context).Wait();
         }
     }
 }

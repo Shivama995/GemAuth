@@ -1,5 +1,6 @@
 ﻿using Common.Configuration;
 using Common.Data;
+using Common.Extensions;
 using Data.Config.Models;
 using Data.Org.Models;
 using MongoDB.Driver;
@@ -10,9 +11,10 @@ namespace Data.Org.DataAccess.Implementations
     {
         public OrgRepository(IConfigManager configManager) : base(configManager) { }
 
-        public async Task<OrgDetails> GetOrgDetails(string DBName)
+        public async Task<OrgDetails> GetOrgDetails(string DBName = null)
         {
-            LoadDatabase(DBName);
+            if(DBName.HasValue())
+                LoadDatabase(DBName);
             var Collection = Database.GetCollection<OrgDetails>("org_base");
             return (await Collection.FindAsync(Builders<OrgDetails>
                 .Filter
@@ -20,18 +22,20 @@ namespace Data.Org.DataAccess.Implementations
                 .FirstOrDefault();
 
         }
-        public async Task<OrgDetails> Register(OrgDetails orgDetails)
+        public async Task<OrgDetails> Register(OrgDetails orgDetails, string DBName = null)
         {
+            if (DBName.HasValue())
+                LoadDatabase(DBName);
             SetModificationDetails(orgDetails);
-            LoadDatabase(orgDetails.DBName);
-
             var Collection = Database.GetCollection<OrgDetails>("org_base");
             await Collection.InsertOneAsync(orgDetails);
             return orgDetails;
         }
 
-        public async Task<List<string>> GetOrgNames()
+        public async Task<List<string>> GetOrgNames(string DBName = null)
         {
+            if(DBName.HasValue())
+                LoadDatabase(DBName);
             var Collection = Database.GetCollection<OrgDetails>("org_base");
 
             return await Collection
@@ -39,9 +43,12 @@ namespace Data.Org.DataAccess.Implementations
                 .Project(row => row.OrgName)
                 .ToListAsync();
         }
-        private async Task SetUpOrgDetails(OrgDetails orgData)
+
+        #region Private Methods
+        private async Task SetUpOrgDetails(OrgDetails orgData, string DBName = null)
         {
-            LoadDatabase(orgData.DBName);
+            if (DBName.HasValue())
+                LoadDatabase(DBName);
 
             var Collection = Database.GetCollection<OrgDetails>("org_base");
             SetModificationDetails(orgData);
@@ -53,5 +60,6 @@ namespace Data.Org.DataAccess.Implementations
             orgDetails.CreatedOn  = DateTime.Now;
             orgDetails.ModifiedOn = DateTime.Now;
         }
+        #endregion
     }
 }

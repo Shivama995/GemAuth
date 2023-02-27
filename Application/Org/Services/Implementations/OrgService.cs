@@ -82,7 +82,7 @@ namespace Application.Org.Services.Implementations
                 _Mapper.Map<ConfigOrgDetails>(orgData));
 
             //Setup Org
-            await _OrgRepository.Register(orgData);
+            await _OrgRepository.Register(orgData, orgData.DBName);
         }
         #endregion
     }

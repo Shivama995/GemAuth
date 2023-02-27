@@ -1,5 +1,8 @@
-﻿using AutoMapper;
+﻿using Application.Authentication;
+using Application.User.DTOs;
+using AutoMapper;
 using Common.Application;
+using Common.Constants;
 using Common.Enums;
 using Common.Exceptions;
 using Common.Extensions;
@@ -26,17 +29,22 @@ namespace Application.User.Services.Implementations
             _ConfigUserRepository = configUserRepository;
             _OrgRepository        = orgRepository;
         }
-        public async Task<UserAggregateModel> GetUserAggregateData(string emailAddress)
+        public async Task<UserAggregateModel> GetUserAggregateData(string identifier, string id)
         {
-            var ConfigUserDetails = await _ConfigUserRepository.GetConfigUserDetails(emailAddress);
+            var ConfigUserDetails = await _ConfigUserRepository.GetConfigUserDetails(identifier, id);
 
             if (ConfigUserDetails.IsNull())
                 throw new UserNotFoundException("User Not Found!");
 
             var OrgDetails        = await _OrgRepository.GetOrgDetails(ConfigUserDetails.DBName);
-            var UserDetails       = await _UserRepository.GetUserDetails(emailAddress, OrgDetails.DBName);
+            var UserDetails       = await _UserRepository.GetUserDetails(UserIdentifiers.EmailAddress, id, OrgDetails.DBName);
 
             return new UserAggregateModel { OrgDetails = OrgDetails, UserDetails = UserDetails };
+        }
+        public async Task<GetUserDTO> GetUserData(string identifier, string id)
+        {
+            var UserData = (await GetUserAggregateData(identifier, id)).UserDetails;
+            return _Mapper.Map<GetUserDTO>(UserData);
         }
         public async Task<UserDetailsModel> CreateAdmin(UserAggregateModel user)
         {
