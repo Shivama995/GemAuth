@@ -6,6 +6,6 @@ namespace Data.User.DataAccess
     {
         Task<UserDetailsModel> GetUserDetails(string identifier, string id);
         Task<UserDetailsModel> GetUserDetailsFromDB(string identifier, string id, string DBName = null);
-        Task<UserDetailsModel> AddAdmin(UserDetailsModel user, string DBName = null);
+        Task<UserDetailsModel> AddNewUser(UserDetailsModel user, string DBName = null);
     }
 }

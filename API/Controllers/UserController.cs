@@ -11,5 +11,9 @@ namespace API.Controllers
         [HttpPost]
         [Route("Get")]
         public async Task<GetUserDTO> Get(GetUserCommand request) => await CommandAsync(request);
+
+        [HttpPost]
+        [Route("Add")]
+        public async Task<AddUserDTO> Add(AddUserCommand request) => await CommandAsync(request);
     }
 }
