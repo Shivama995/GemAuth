@@ -1,9 +1,10 @@
 ﻿using Common.Configuration;
 using Common.Constants;
-using Microsoft.Extensions.Configuration;
+using Common.Extensions;
+using Data.User.Models;
 using MongoDB.Driver;
 
-namespace Common.Data
+namespace Data
 {
     public class RepoBase
     {
@@ -26,6 +27,16 @@ namespace Common.Data
         public void LoadDatabase(string databaseName)
         {
             Database = Client.GetDatabase(databaseName);
+        }
+
+        public void LoadOrgDatabase()
+        {
+            try
+            {
+                if (UserAggregateAuthModel.OrgDetails.DBName.HasValue())
+                    Database = Client.GetDatabase(UserAggregateAuthModel.OrgDetails.DBName);
+            }
+            catch {/*Log user auth model not filled here*/ }
         }
     }
 }

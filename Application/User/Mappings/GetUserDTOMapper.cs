@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.User.DTOs;
+using AutoMapper;
 using Data.User.Models;
 
 namespace Application.User.Mappings
@@ -7,7 +8,7 @@ namespace Application.User.Mappings
     {
         public GetUserDTOMapper()
         {
-            CreateMap<UserDetailsModel, GetUserDTOMapper>();
+            CreateMap<UserDetailsModel, GetUserDTO>();
         }
     }
 }

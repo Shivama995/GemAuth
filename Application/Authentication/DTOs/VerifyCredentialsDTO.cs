@@ -1,6 +1,6 @@
 ﻿using Common.Application.Token;
 
-namespace Application.Authentication.Requests
+namespace Application.Authentication.DTOs
 {
     public class VerifyCredentialsDTO
     {

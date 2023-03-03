@@ -1,11 +1,10 @@
 ﻿using Data.Org.Models;
-using Data.User.Models;
 
-namespace Application.Authentication
+namespace Data.User.Models
 {
     public static class UserAggregateAuthModel
     {
-        public static OrgDetails       OrgDetails { get; set; }
         public static UserDetailsModel UserDetails { get; set; }
+        public static OrgDetails       OrgDetails       { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Application.Authentication.CommandHandlers;
-using Application.Authentication.Requests;
+using Application.Authentication.DTOs;
 using Application.Token.Services;
 using Application.User.Services;
 using AutoMapper;
@@ -7,7 +7,6 @@ using Common.Application;
 using Common.Constants;
 using Common.Exceptions;
 using Common.Extensions;
-using Data.User.DataAccess;
 
 namespace Application.Authentication.Services.Implementations
 {
@@ -24,19 +23,19 @@ namespace Application.Authentication.Services.Implementations
         }
         public async Task<VerifyCredentialsDTO> Verify(VerifyCredentialsCommand request)
         {
-            var UserAggregateData = await _UserService.GetUserAggregateData(UserIdentifiers.EmailAddress, request.EmailAddress);
-            if (UserAggregateData.IsNull())
+            var UserAuthData = await _UserService.GetUserAuthData(UserIdentifiers.EmailAddress, request.EmailAddress);
+            if (UserAuthData.IsNull())
                 throw new UserNotFoundException("Email Address not found!");
 
-            if (!string.Equals(UserAggregateData.UserDetails.Password, request.Password))
+            if (!string.Equals(UserAuthData.UserDetails.Password, request.Password))
                 throw new UserNotFoundException("Password Incorrect");
 
-            var Token = await _LoginTokenService.CreateLoginToken(UserAggregateData.UserDetails);
+            var Token = await _LoginTokenService.CreateLoginToken(UserAuthData.UserDetails);
 
             return new VerifyCredentialsDTO
             {
                 Token     = Token,
-                FirstName = UserAggregateData.UserDetails.FirstName
+                FirstName = UserAuthData.UserDetails.FirstName
             };
         }
     }

@@ -1,4 +1,4 @@
-﻿using Application.Authentication.Requests;
+﻿using Application.Authentication.DTOs;
 using Application.Authentication.Services;
 using MediatR;
 
