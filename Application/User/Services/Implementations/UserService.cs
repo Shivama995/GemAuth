@@ -36,8 +36,20 @@ namespace Application.User.Services.Implementations
             if (ConfigUserDetails.IsNull())
                 throw new UserNotFoundException("User Not Found!");
 
-            var OrgDetails        = await _OrgRepository.GetOrgDetails(ConfigUserDetails.DBName);
-            var UserDetails       = await _UserRepository.GetUserDetails(UserIdentifiers.EmailAddress, id, OrgDetails.DBName);
+            var OrgDetails        = await _OrgRepository.GetOrgDetails();
+            var UserDetails       = await _UserRepository.GetUserDetails(identifier, id);
+
+            return new UserAggregateModel { OrgDetails = OrgDetails, UserDetails = UserDetails };
+        }
+        public async Task<UserAggregateModel> GetUserAuthData(string identifier, string id)
+        {
+            var ConfigUserDetails = await _ConfigUserRepository.GetConfigUserDetails(identifier, id);
+
+            if (ConfigUserDetails.IsNull())
+                throw new UserNotFoundException("User Not Found!");
+
+            var OrgDetails        = await _OrgRepository.GetOrgDetailsFromDB(ConfigUserDetails.DBName);
+            var UserDetails       = await _UserRepository.GetUserDetailsFromDB(identifier, id, OrgDetails.DBName);
 
             return new UserAggregateModel { OrgDetails = OrgDetails, UserDetails = UserDetails };
         }

@@ -1,5 +1,5 @@
 ﻿using Application.Authentication.CommandHandlers;
-using Application.Authentication.Requests;
+using Application.Authentication.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers

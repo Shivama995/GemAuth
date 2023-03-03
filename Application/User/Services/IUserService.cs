@@ -7,6 +7,7 @@ namespace Application.User.Services
     {
         public Task<UserDetailsModel> CreateAdmin(UserAggregateModel user);
         Task<UserAggregateModel> GetUserAggregateData(string identifier, string id);
+        Task<UserAggregateModel> GetUserAuthData(string identifier, string id);
         Task<GetUserDTO> GetUserData(string identifier, string id);
     }
 }

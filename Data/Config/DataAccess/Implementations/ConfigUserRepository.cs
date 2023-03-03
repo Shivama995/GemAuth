@@ -1,5 +1,4 @@
 ﻿using Common.Configuration;
-using Common.Data;
 using Data.Config.Models;
 using MongoDB.Driver;
 

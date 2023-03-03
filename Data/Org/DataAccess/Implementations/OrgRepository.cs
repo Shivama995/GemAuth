@@ -1,8 +1,7 @@
 ﻿using Common.Configuration;
-using Common.Data;
 using Common.Extensions;
-using Data.Config.Models;
 using Data.Org.Models;
+using Data.User.Models;
 using MongoDB.Driver;
 
 namespace Data.Org.DataAccess.Implementations
@@ -11,9 +10,20 @@ namespace Data.Org.DataAccess.Implementations
     {
         public OrgRepository(IConfigManager configManager) : base(configManager) { }
 
-        public async Task<OrgDetails> GetOrgDetails(string DBName = null)
+        public async Task<OrgDetails> GetOrgDetails()
         {
-            if(DBName.HasValue())
+            LoadOrgDatabase();
+            var Collection = Database.GetCollection<OrgDetails>("org_base");
+            return (await Collection.FindAsync(Builders<OrgDetails>
+                .Filter
+                .Eq("DBName", UserAggregateAuthModel.OrgDetails.DBName)))
+                .FirstOrDefault();
+
+        }
+
+        public async Task<OrgDetails> GetOrgDetailsFromDB(string DBName = null)
+        {
+            if (DBName.HasValue())
                 LoadDatabase(DBName);
             var Collection = Database.GetCollection<OrgDetails>("org_base");
             return (await Collection.FindAsync(Builders<OrgDetails>
@@ -22,6 +32,7 @@ namespace Data.Org.DataAccess.Implementations
                 .FirstOrDefault();
 
         }
+
         public async Task<OrgDetails> Register(OrgDetails orgDetails, string DBName = null)
         {
             if (DBName.HasValue())
@@ -32,10 +43,8 @@ namespace Data.Org.DataAccess.Implementations
             return orgDetails;
         }
 
-        public async Task<List<string>> GetOrgNames(string DBName = null)
+        public async Task<List<string>> GetOrgNames()
         {
-            if(DBName.HasValue())
-                LoadDatabase(DBName);
             var Collection = Database.GetCollection<OrgDetails>("org_base");
 
             return await Collection

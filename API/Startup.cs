@@ -10,6 +10,7 @@ using Common.Logger.Implementations;
 using Common.Redis.Implementations;
 using Data;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System.Reflection;
 

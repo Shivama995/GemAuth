@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    public class OrgController : PrivateController
+    public class OrgController : PublicController
     {
         public OrgController(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor) { }
 

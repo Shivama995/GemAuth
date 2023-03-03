@@ -51,8 +51,8 @@ namespace Application.Token.Services.Implementations
             if (TokenModel.IsNull() || TokenModel.Authorization.IsEmpty() || !TokenModel.Authorization.Equals(token))
                 throw new AuthorizationTokenExpiredException();
 
-            var UserAggregateDetails = await _UserService.GetUserAggregateData(UserIdentifiers.EmailAddress, LoginTokenModel.EmailAddress);
-            return new VerifyLoginTokenDTO { UserData = UserAggregateDetails };
+            var UserAuthData = await _UserService.GetUserAuthData(UserIdentifiers.EmailAddress, LoginTokenModel.EmailAddress);
+            return new VerifyLoginTokenDTO { UserData = UserAuthData };
         }
         #region Private Methods
         private async Task<UserDetailsModel> GetModelFromClaims(JwtSecurityToken token)

@@ -1,5 +1,5 @@
 ﻿using Application.Authentication.CommandHandlers;
-using Application.Authentication.Requests;
+using Application.Authentication.DTOs;
 
 namespace Application.Authentication.Services
 {
