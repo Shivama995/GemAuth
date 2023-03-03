@@ -1,8 +1,7 @@
-﻿using Application.Authentication;
+﻿using Application.User.CommandHandlers;
 using Application.User.DTOs;
 using AutoMapper;
 using Common.Application;
-using Common.Constants;
 using Common.Enums;
 using Common.Exceptions;
 using Common.Extensions;
@@ -63,11 +62,30 @@ namespace Application.User.Services.Implementations
             user.UserDetails.Id   = Guid.NewGuid().ToString();
             user.UserDetails.Role = UserRole.Admin;
 
-            await AddAdminForConfig(user);
-            return await _UserRepository.AddAdmin(user.UserDetails, user.OrgDetails.DBName);
+            await AddUserForConfig(user);
+            return await _UserRepository.AddNewUser(user.UserDetails, user.OrgDetails.DBName);
+        }
+        public async Task<AddUserDTO> CreateNewUser(AddUserCommand user)
+        {
+            ValidateCreateNewUserRequirements();
+            UserDetailsModel User = new();
+            User                  = _Mapper.Map<UserDetailsModel>(user);
+            User.Id               = Guid.NewGuid().ToString();
+            User.OrgCode          = UserAggregateAuthModel.OrgDetails.OrgCode;
+            User.Role             = (UserRole)Enum.Parse(typeof(UserRole), user.Role);
+
+            await AddUserForConfig(new UserAggregateModel { UserDetails = User, OrgDetails = UserAggregateAuthModel.OrgDetails });
+            var NewUser = await _UserRepository.AddNewUser(User, UserAggregateAuthModel.OrgDetails.DBName);
+            return _Mapper.Map<AddUserDTO>(NewUser);
         }
 
-        private async Task AddAdminForConfig(UserAggregateModel user)
+        private void ValidateCreateNewUserRequirements()
+        {
+            if (UserAggregateAuthModel.UserDetails.IsNull() || UserAggregateAuthModel.UserDetails.Role != UserRole.Admin)
+                throw new UnauthorizedAccessException();
+        }
+
+        private async Task AddUserForConfig(UserAggregateModel user)
         {
             ConfigUserDetails ConfigUserDetails = _Mapper.Map<ConfigUserDetails>(user.UserDetails);
             ConfigUserDetails.DBName  = user.OrgDetails.DBName;

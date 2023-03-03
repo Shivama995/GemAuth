@@ -31,7 +31,7 @@ namespace Data.User.DataAccess.Implementations
                 .FirstOrDefault();
 
         }
-        public async Task<UserDetailsModel> AddAdmin(UserDetailsModel user, string DBName = null)
+        public async Task<UserDetailsModel> AddNewUser(UserDetailsModel user, string DBName = null)
         {
             if (DBName.HasValue())
                 LoadDatabase(DBName);
